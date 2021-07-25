@@ -8,6 +8,7 @@ const server: FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify
 })
 
 const startFastify: (port: number) => FastifyInstance<Server, IncomingMessage, ServerResponse> = (port) => {
+  server.register(require('fastify-cors'), {})
   server.listen(port, (err, _) => {
     if (err) {
       console.error(err)
@@ -19,7 +20,7 @@ const startFastify: (port: number) => FastifyInstance<Server, IncomingMessage, S
     return reply.status(200).send({ msg: 'pong' })
   })
 
-  server.register(FormRouter, { prefix: '/api/v1' })
+  server.register(FormRouter, { prefix: '/api' })
 
   return server
 }
