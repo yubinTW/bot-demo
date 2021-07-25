@@ -24,6 +24,7 @@ const App = () => {
         <thead>
           <tr>
             <th>ID</th>
+            <td>Username</td>
             <th>Computer Name</th>
             <th>Status</th>
             <th>Create At</th>
