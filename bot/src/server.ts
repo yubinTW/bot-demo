@@ -1,6 +1,8 @@
 import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { Server, IncomingMessage, ServerResponse } from 'http'
 import util from 'util'
+import * as API from './API'
+import { IForm } from './types/form'
 
 type WebHookRequest = {
   queryResult: {
@@ -10,6 +12,24 @@ type WebHookRequest = {
     intent: {
       name: string
       displayName: string
+    }
+  }
+  originalDetectIntentRequest: {
+    source: string
+    payload: {
+      data: {
+        chat: {
+          id: string
+          type: string
+        }
+        from: {
+          username: string
+          first_name: string
+          id: number
+        }
+        date: number
+        message_id: number
+      }
     }
   }
 }
@@ -35,18 +55,42 @@ const startFastify: (port: number) => FastifyInstance<Server, IncomingMessage, S
     const intent = data.queryResult.intent.displayName
     if (intent === 'Get Computer Name - yes') {
       const computerName = data.queryResult.parameters['computerName']
+      const username = data.originalDetectIntentRequest.payload.data.from.username || ''
       console.log('computerName = ', computerName)
-      // TODO: call Backend API to create the form
-      const response = {
-        fulfillmentMessages: [
-          {
-            text: {
-              text: [`已為電腦 ${computerName} 建立報修單`]
-            }
-          }
-        ]
+      console.log('username = ', username)
+      // call Backend API to create the form
+      const formBody: IForm = {
+        username,
+        computerName,
+        status: 'new'
       }
-      return reply.status(200).send(response)
+
+      try {
+        const {
+          data: { form }
+        }: IForm | any = await API.addForm(formBody)
+        const response = {
+          fulfillmentMessages: [
+            {
+              text: {
+                text: [`已為電腦 ${computerName} 建立報修單, 報修單號： ${form._id}`]
+              }
+            }
+          ]
+        }
+        return reply.status(200).send(response)
+      } catch (error) {
+        const response = {
+          fulfillmentMessages: [
+            {
+              text: {
+                text: [`系統錯誤，請稍後再試`]
+              }
+            }
+          ]
+        }
+        return reply.status(200).send(response)
+      }
     }
 
     // default response
