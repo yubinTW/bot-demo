@@ -1,16 +1,10 @@
-import { FastifyInstance } from 'fastify'
-import { startFastify } from '../server'
-import { Server, IncomingMessage, ServerResponse } from 'http'
 import * as dbHandler from './db'
 import { IForm } from '../types/form'
 import { FormRepoImpl } from '../repo/form-repo'
 
 describe('Form-Repo tests', () => {
-  let server: FastifyInstance<Server, IncomingMessage, ServerResponse>
-
   beforeAll(async () => {
     await dbHandler.connect()
-    server = startFastify(8888)
   })
 
   afterEach(async () => {
@@ -20,7 +14,6 @@ describe('Form-Repo tests', () => {
   afterAll(async () => {
     try {
       await dbHandler.closeDatabase()
-      server.close((): void => {})
     } catch (error) {
       console.error(error)
     }
