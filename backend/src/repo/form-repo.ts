@@ -3,6 +3,7 @@ import Form from './../models/form'
 
 interface FormRepo {
   getForms(): Promise<Array<IForm>>
+  getForm(id: string): Promise<IForm | null>
   addForm(formBody: IForm): Promise<IForm>
   updateForm(id: string, formBody: IForm): Promise<IForm | null>
   deleteForm(id: string): Promise<IForm | null>
