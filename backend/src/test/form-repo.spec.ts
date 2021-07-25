@@ -33,6 +33,7 @@ describe('Form-Repo tests', () => {
     // create
     const formBody: IForm = {
       computerName: 'LLB20558',
+      username: 'yubin',
       status: 'new'
     }
     const newForm: IForm = await formRepo.addForm(formBody)
